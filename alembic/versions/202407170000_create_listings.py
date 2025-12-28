@@ -8,9 +8,9 @@ branch_labels = None
 depends_on = None
 
 property_type_enum = postgresql.ENUM(
-    "apartment", "house", "land", "office", name="property_type_enum"
+    "apartment", "house", "land", "office", name="property_type_enum", create_type=False
 )
-listing_type_enum = postgresql.ENUM("sale", "rent", name="listing_type_enum")
+listing_type_enum = postgresql.ENUM("sale", "rent", name="listing_type_enum", create_type=False)
 
 
 def upgrade() -> None:

@@ -7,7 +7,9 @@ down_revision = "202407170000"
 branch_labels = None
 depends_on = None
 
-user_role_enum = postgresql.ENUM("user", "moderator", "admin", name="user_role_enum")
+user_role_enum = postgresql.ENUM(
+    "user", "moderator", "admin", name="user_role_enum", create_type=False
+)
 
 
 def upgrade() -> None:
