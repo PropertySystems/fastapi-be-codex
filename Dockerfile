@@ -17,8 +17,8 @@ WORKDIR /app
 ENV PATH="/root/.local/bin:${PATH}" \
     UV_PROJECT_ENVIRONMENT="/app/.venv"
 
-COPY pyproject.toml .
-RUN uv sync --python /usr/local/bin/python
+COPY pyproject.toml uv.lock ./
+RUN uv sync --python /usr/local/bin/python --no-install-project
 
 FROM python:3.14-slim AS runtime
 
