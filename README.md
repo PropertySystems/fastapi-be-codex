@@ -7,6 +7,7 @@ FastAPI backend scaffold for managing property listings with async PostgreSQL ac
 - Async SQLAlchemy database access with PostgreSQL and Alembic migrations.
 - Pydantic models for request/response validation.
 - Versioned API routing under `/api/v1`.
+- JWT-based authentication with role-aware authorization guards.
 
 ## Getting started
 1. Ensure Python 3.14.2 is available and install [`uv`](https://github.com/astral-sh/uv):
@@ -35,6 +36,9 @@ FastAPI backend scaffold for managing property listings with async PostgreSQL ac
 
 ## API
 - `POST /api/v1/listings` – create a listing with pricing, location, and property metadata.
+- `POST /api/v1/auth/register` – register a user account.
+- `POST /api/v1/auth/login` – obtain an access token.
+- `GET /api/v1/auth/me` – retrieve the authenticated user's profile.
 
 ## Migrations
 Alembic configuration lives in `alembic/`, with versioned scripts under `alembic/versions/`. Update models in `app/models/` and generate new revisions with:

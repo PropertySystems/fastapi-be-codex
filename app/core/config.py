@@ -6,6 +6,9 @@ class Settings(BaseSettings):
     app_name: str = Field("Listings API", alias="APP_NAME")
     app_env: str = Field("development", alias="APP_ENV")
     database_url: str = Field(..., alias="DATABASE_URL")
+    secret_key: str = Field(..., alias="SECRET_KEY")
+    token_algorithm: str = Field("HS256", alias="TOKEN_ALGORITHM")
+    access_token_expire_minutes: int = Field(30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", env_prefix="")
 
