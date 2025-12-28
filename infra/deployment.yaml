@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: property-backend-deployment
+  namespace: prop-sys-be
+  labels:
+    app: property-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: property-backend
+  template:
+    metadata:
+      labels:
+        app: property-backend
+    spec:
+      containers:
+        - name: property-backend
+          image: ghcr.io/propertysystems/fastapi-be-codex:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: APP_ENV
+              value: production
+            - name: DATABASE_URL
+              value: postgresql+asyncpg://postgres:<password>@192.168.68.126:5432/promo-catcher-dev01
+            - name: SECRET_KEY
+              value: change-me

@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: property-backend-ingress-secure
+  namespace: prop-sys-be
+spec:
+  routes:
+    - match: Host(`property-backend.memcommerce.shop`)
+      kind: Rule
+      services:
+        - name: property-backend-svc
+          port: 8000
+  tls:
+    certResolver: letsencrypt
+    domains:
+      - main: "memcommerce.shop"
+        sans:
+          - "property-backend.memcommerce.shop"
