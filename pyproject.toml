@@ -29,3 +29,6 @@ profile = "black"
 
 [tool.uv]
 python-preference = "only-managed"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
