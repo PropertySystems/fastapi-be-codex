@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: property-backend-svc
+  namespace: prop-sys-be
+spec:
+  selector:
+    app: property-backend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP
