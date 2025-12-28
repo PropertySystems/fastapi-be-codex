@@ -22,7 +22,11 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255))
     role = Column(
-        Enum(UserRole, name="user_role_enum"),
+        Enum(
+            UserRole,
+            name="user_role_enum",
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+        ),
         nullable=False,
         server_default=UserRole.USER.value,
     )

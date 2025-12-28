@@ -8,7 +8,8 @@ from pydantic import BaseModel
 from app.core.config import settings
 from app.models.user import UserRole
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# bcrypt_sha256 avoids bcrypt's 72-byte input limit while remaining compatible with bcrypt hashes.
+pwd_context = CryptContext(schemes=["bcrypt_sha256"], deprecated="auto")
 
 
 def get_password_hash(password: str) -> str:
