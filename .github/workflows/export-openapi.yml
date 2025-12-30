@@ -1,0 +1,60 @@
+name: Export OpenAPI to Frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout backend
+        uses: actions/checkout@v4
+
+      - name: Set up uv with Python
+        uses: astral-sh/setup-uv@v4
+        with:
+          python-version: "3.14"
+
+      - name: Sync dependencies
+        run: uv sync --frozen
+
+      - name: Generate OpenAPI spec
+        env:
+          DATABASE_URL: postgresql://example:example@localhost:5432/example
+          SECRET_KEY: dummy-secret-key
+          APP_ENV: ci
+        run: uv run python scripts/export_openapi.py --output openapi.json
+
+      - name: Checkout frontend repository
+        uses: actions/checkout@v4
+        with:
+          repository: PropertySystems/nextjs-fe-codex
+          token: ${{ secrets.FRONTEND_REPO_TOKEN }}
+          path: nextjs-fe-codex
+
+      - name: Update OpenAPI document in frontend repo
+        run: |
+          mkdir -p nextjs-fe-codex/docs
+          cp openapi.json nextjs-fe-codex/docs/openapi.json
+
+      - name: Commit and push changes
+        working-directory: nextjs-fe-codex
+        env:
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add docs/openapi.json
+          git commit -m "chore: update OpenAPI spec"
+          git push
