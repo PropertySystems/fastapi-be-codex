@@ -25,8 +25,9 @@ FastAPI backend scaffold for managing property listings with async PostgreSQL ac
    cp .env.example .env
    # update DATABASE_URL if needed
    ```
-   - Set `CORS_ORIGINS` to a comma-separated list of frontend URLs (e.g., `http://localhost:3000,https://frontend.example.com`).
-     The same value should be provided to deployment manifests to allow browsers to call the API.
+   - Set `CORS_ORIGINS` to a comma-separated list of frontend URLs (defaults include `https://property-systems.memcommerce.shop`,
+     `http://localhost:3000`, and `http://localhost:5173`). The same value should be provided to deployment manifests to allow
+     browsers to call the API.
 4. Run database migrations:
    ```bash
    alembic upgrade head
