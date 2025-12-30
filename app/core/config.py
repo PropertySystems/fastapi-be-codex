@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     secret_key: str = Field(..., alias="SECRET_KEY")
     token_algorithm: str = Field("HS256", alias="TOKEN_ALGORITHM")
     access_token_expire_minutes: int = Field(30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    bucket_name: str = Field("", alias="BUCKET_NAME")
+    sa_key_path: str | None = Field(None, alias="SA_KEY_PATH")
     cors_origins: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: [
             "https://property-systems.memcommerce.shop",

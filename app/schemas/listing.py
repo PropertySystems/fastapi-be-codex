@@ -33,9 +33,18 @@ class ListingCreate(ListingBase):
     pass
 
 
+class ListingImageRead(BaseModel):
+    id: uuid.UUID
+    url: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ListingRead(ListingBase):
     id: uuid.UUID
     user_id: uuid.UUID
     created_at: datetime
+    images: list[ListingImageRead] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
