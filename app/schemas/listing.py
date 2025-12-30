@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class PropertyType(str, Enum):
@@ -27,6 +27,15 @@ class ListingBase(BaseModel):
     city: str = Field(..., max_length=100)
     area_sqm: int = Field(..., gt=0)
     rooms: int = Field(..., ge=0)
+
+    model_config = ConfigDict(use_enum_values=True)
+
+    @field_validator("property_type", "listing_type", mode="before")
+    @classmethod
+    def normalize_enum_values(cls, value: str | Enum) -> str | Enum:
+        if isinstance(value, str):
+            return value.lower()
+        return value
 
 
 class ListingCreate(ListingBase):
