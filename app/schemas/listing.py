@@ -35,6 +35,7 @@ class ListingCreate(ListingBase):
 
 class ListingRead(ListingBase):
     id: uuid.UUID
+    user_id: uuid.UUID
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

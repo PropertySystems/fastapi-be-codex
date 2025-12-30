@@ -3,6 +3,7 @@ import uuid
 
 from sqlalchemy import Column, DateTime, Enum, String
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.db.base import Base
@@ -31,3 +32,5 @@ class User(Base):
         server_default=UserRole.USER.value,
     )
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    listings = relationship("Listing", back_populates="user", cascade="all, delete-orphan")
