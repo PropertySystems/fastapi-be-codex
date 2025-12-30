@@ -30,3 +30,15 @@ spec:
               value: change-me
             - name: CORS_ORIGINS
               value: https://property-systems.memcommerce.shop,http://localhost:3000,http://localhost:5173
+            - name: SA_KEY_PATH
+              value: /app/secrets/sa-credentials.json
+            - name: BUCKET_NAME
+              value: property-systems
+          volumeMounts:
+            - name: gcp-creds
+              mountPath: /app/secrets
+              readOnly: true
+      volumes:
+        - name: gcp-creds
+          secret:
+            secretName: gcp-creds-secret

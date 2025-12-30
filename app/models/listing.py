@@ -54,3 +54,9 @@ class Listing(Base):
     )
 
     user = relationship("User", back_populates="listings")
+    images = relationship(
+        "ListingImage",
+        back_populates="listing",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
