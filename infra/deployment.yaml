@@ -29,4 +29,4 @@ spec:
             - name: SECRET_KEY
               value: change-me
             - name: CORS_ORIGINS
-              value: http://localhost:3000
+              value: https://property-systems.memcommerce.shop,http://localhost:3000,http://localhost:5173

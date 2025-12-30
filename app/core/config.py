@@ -10,7 +10,12 @@ class Settings(BaseSettings):
     token_algorithm: str = Field("HS256", alias="TOKEN_ALGORITHM")
     access_token_expire_minutes: int = Field(30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
     cors_origins: list[str] = Field(
-        default_factory=lambda: ["http://localhost:3000"], alias="CORS_ORIGINS"
+        default_factory=lambda: [
+            "https://property-systems.memcommerce.shop",
+            "http://localhost:3000",
+            "http://localhost:5173",
+        ],
+        alias="CORS_ORIGINS",
     )
 
     @field_validator("cors_origins", mode="before")
