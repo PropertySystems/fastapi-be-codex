@@ -19,8 +19,8 @@ async def create_listing(
     payload: ListingCreate,
     session: AsyncSession = Depends(get_session),
     service: ListingService = Depends(get_listing_service),
-    _current_user: User = Depends(
+    current_user: User = Depends(
         require_roles((UserRole.USER, UserRole.MODERATOR, UserRole.ADMIN))
     ),
 ) -> ListingRead:
-    return await service.create_listing(session, payload)
+    return await service.create_listing(session, payload, current_user)

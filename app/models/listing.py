@@ -1,8 +1,19 @@
 import enum
 import uuid
 
-from sqlalchemy import CheckConstraint, Column, DateTime, Enum, Integer, Numeric, String, Text
+from sqlalchemy import (
+    CheckConstraint,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Text,
+)
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.db.base import Base
@@ -24,6 +35,7 @@ class Listing(Base):
     __tablename__ = "listings"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     title = Column(String(255), nullable=False)
     description = Column(Text)
     property_type = Column(Enum(PropertyType, name="property_type_enum"), nullable=False)
@@ -40,3 +52,5 @@ class Listing(Base):
         CheckConstraint("area_sqm > 0", name="ck_listings_area_positive"),
         CheckConstraint("rooms >= 0", name="ck_listings_rooms_non_negative"),
     )
+
+    user = relationship("User", back_populates="listings")
