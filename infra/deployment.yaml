@@ -28,3 +28,5 @@ spec:
               value: postgresql+asyncpg://postgres:<password>@192.168.68.126:5432/promo-catcher-dev01
             - name: SECRET_KEY
               value: change-me
+            - name: CORS_ORIGINS
+              value: http://localhost:3000
