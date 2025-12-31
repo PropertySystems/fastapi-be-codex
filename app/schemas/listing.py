@@ -17,6 +17,18 @@ class ListingType(str, Enum):
     RENT = "rent"
 
 
+class ListingSortField(str, Enum):
+    CREATED_AT = "created_at"
+    PRICE = "price"
+    AREA_SQM = "area_sqm"
+    ROOMS = "rooms"
+
+
+class SortOrder(str, Enum):
+    ASC = "asc"
+    DESC = "desc"
+
+
 class ListingBase(BaseModel):
     title: str = Field(..., max_length=255)
     description: str | None = None
@@ -57,3 +69,10 @@ class ListingRead(ListingBase):
     images: list[ListingImageRead] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ListingListRead(BaseModel):
+    items: list[ListingRead]
+    total: int
+    page: int
+    page_size: int

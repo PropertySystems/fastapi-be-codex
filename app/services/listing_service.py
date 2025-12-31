@@ -6,7 +6,14 @@ from sqlalchemy.orm.attributes import set_committed_value
 
 from app.models.user import User, UserRole
 from app.repositories.listing_repository import ListingRepository
-from app.schemas.listing import ListingCreate, ListingImageRead, ListingRead
+from app.schemas.listing import (
+    ListingCreate,
+    ListingImageRead,
+    ListingListRead,
+    ListingRead,
+    ListingSortField,
+    SortOrder,
+)
 from app.services.storage_service import GCSStorageService, StorageService
 
 
@@ -48,3 +55,63 @@ class ListingService:
         image_url = await storage.upload_listing_image(file, listing_id)
         image = await self.repository.add_image(session, listing_id, image_url)
         return ListingImageRead.model_validate(image)
+
+    async def list_listings(
+        self,
+        session: AsyncSession,
+        *,
+        page: int,
+        page_size: int,
+        sort_by: ListingSortField,
+        sort_order: SortOrder,
+        property_type: str | None = None,
+        listing_type: str | None = None,
+        city: str | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
+        min_area: int | None = None,
+        max_area: int | None = None,
+        min_rooms: int | None = None,
+        max_rooms: int | None = None,
+    ) -> ListingListRead:
+        if min_price is not None and max_price is not None and min_price > max_price:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Minimum price cannot exceed maximum price",
+            )
+
+        if min_area is not None and max_area is not None and min_area > max_area:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Minimum area cannot exceed maximum area",
+            )
+
+        if min_rooms is not None and max_rooms is not None and min_rooms > max_rooms:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Minimum rooms cannot exceed maximum rooms",
+            )
+
+        listings, total = await self.repository.list(
+            session,
+            page=page,
+            page_size=page_size,
+            sort_field=sort_by.value,
+            sort_descending=sort_order == SortOrder.DESC,
+            property_type=property_type,
+            listing_type=listing_type,
+            city=city,
+            min_price=min_price,
+            max_price=max_price,
+            min_area=min_area,
+            max_area=max_area,
+            min_rooms=min_rooms,
+            max_rooms=max_rooms,
+        )
+
+        return ListingListRead(
+            items=[ListingRead.model_validate(listing) for listing in listings],
+            total=total,
+            page=page,
+            page_size=page_size,
+        )
