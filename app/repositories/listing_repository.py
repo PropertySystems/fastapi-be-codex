@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from app.models.listing import Listing
 from app.models.listing_image import ListingImage
-from app.schemas.listing import ListingCreate
+from app.schemas.listing import ListingCreate, ListingUpdate
 
 
 class ListingRepository:
@@ -26,6 +26,18 @@ class ListingRepository:
                 .where(Listing.id == listing_id)
         )
         return result.scalar_one_or_none()
+
+    async def update(
+        self, session: AsyncSession, listing: Listing, listing_data: ListingUpdate
+    ) -> Listing:
+        data = listing_data.model_dump(exclude_unset=True)
+
+        for field, value in data.items():
+            setattr(listing, field, value)
+
+        await session.flush()
+        await session.refresh(listing)
+        return listing
 
     async def add_image(
         self, session: AsyncSession, listing_id: UUID, url: str

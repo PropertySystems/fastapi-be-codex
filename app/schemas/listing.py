@@ -54,6 +54,27 @@ class ListingCreate(ListingBase):
     pass
 
 
+class ListingUpdate(BaseModel):
+    title: str | None = Field(None, max_length=255)
+    description: str | None = None
+    property_type: PropertyType | None = None
+    listing_type: ListingType | None = None
+    price: float | None = Field(None, ge=0)
+    currency: str | None = Field(None, min_length=3, max_length=3)
+    city: str | None = Field(None, max_length=100)
+    area_sqm: int | None = Field(None, gt=0)
+    rooms: int | None = Field(None, ge=0)
+
+    model_config = ConfigDict(use_enum_values=True)
+
+    @field_validator("property_type", "listing_type", mode="before")
+    @classmethod
+    def normalize_enum_values(cls, value: str | Enum | None) -> str | Enum | None:
+        if isinstance(value, str):
+            return value.lower()
+        return value
+
+
 class ListingImageRead(BaseModel):
     id: uuid.UUID
     url: str
