@@ -42,6 +42,7 @@ FastAPI backend scaffold for managing property listings with async PostgreSQL ac
 
 ## API
 - `POST /api/v1/listings` – create a listing with pricing, location, and property metadata.
+- `GET /api/v1/listings/{listing_id}` – fetch a listing by its identifier, including associated images.
 - `POST /api/v1/listings/{listing_id}/images` – upload an image file for a listing; stores the image in GCS and returns its URL.
 - `POST /api/v1/auth/register` – register a user account.
 - `POST /api/v1/auth/login` – obtain an access token.
