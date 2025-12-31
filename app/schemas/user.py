@@ -15,6 +15,13 @@ class UserCreate(UserBase):
     password: str = Field(..., min_length=8)
 
 
+class UserUpdate(BaseModel):
+    email: EmailStr | None = None
+    full_name: str | None = Field(None, max_length=255)
+    role: UserRole | None = None
+    password: str | None = Field(None, min_length=8)
+
+
 class UserRead(UserBase):
     id: uuid.UUID
     created_at: datetime
