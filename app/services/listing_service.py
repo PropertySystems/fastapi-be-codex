@@ -94,24 +94,16 @@ class ListingService:
 
         await self.repository.delete(session, existing_listing)
 
-    async def list_listings(
+    def _validate_filters(
         self,
-        session: AsyncSession,
         *,
-        page: int,
-        page_size: int,
-        sort_by: ListingSortField,
-        sort_order: SortOrder,
-        property_type: str | None = None,
-        listing_type: str | None = None,
-        city: str | None = None,
-        min_price: float | None = None,
-        max_price: float | None = None,
-        min_area: int | None = None,
-        max_area: int | None = None,
-        min_rooms: int | None = None,
-        max_rooms: int | None = None,
-    ) -> ListingListRead:
+        min_price: float | None,
+        max_price: float | None,
+        min_area: int | None,
+        max_area: int | None,
+        min_rooms: int | None,
+        max_rooms: int | None,
+    ) -> None:
         if min_price is not None and max_price is not None and min_price > max_price:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -130,12 +122,92 @@ class ListingService:
                 detail="Minimum rooms cannot exceed maximum rooms",
             )
 
+    async def list_listings(
+        self,
+        session: AsyncSession,
+        *,
+        page: int,
+        page_size: int,
+        sort_by: ListingSortField,
+        sort_order: SortOrder,
+        property_type: str | None = None,
+        listing_type: str | None = None,
+        city: str | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
+        min_area: int | None = None,
+        max_area: int | None = None,
+        min_rooms: int | None = None,
+        max_rooms: int | None = None,
+    ) -> ListingListRead:
+        self._validate_filters(
+            min_price=min_price,
+            max_price=max_price,
+            min_area=min_area,
+            max_area=max_area,
+            min_rooms=min_rooms,
+            max_rooms=max_rooms,
+        )
+
         listings, total = await self.repository.list(
             session,
             page=page,
             page_size=page_size,
             sort_field=sort_by.value,
             sort_descending=sort_order == SortOrder.DESC,
+            property_type=property_type,
+            listing_type=listing_type,
+            city=city,
+            min_price=min_price,
+            max_price=max_price,
+            min_area=min_area,
+            max_area=max_area,
+            min_rooms=min_rooms,
+            max_rooms=max_rooms,
+        )
+
+        return ListingListRead(
+            items=[ListingRead.model_validate(listing) for listing in listings],
+            total=total,
+            page=page,
+            page_size=page_size,
+        )
+
+    async def list_user_listings(
+        self,
+        session: AsyncSession,
+        *,
+        user: User,
+        page: int,
+        page_size: int,
+        sort_by: ListingSortField,
+        sort_order: SortOrder,
+        property_type: str | None = None,
+        listing_type: str | None = None,
+        city: str | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
+        min_area: int | None = None,
+        max_area: int | None = None,
+        min_rooms: int | None = None,
+        max_rooms: int | None = None,
+    ) -> ListingListRead:
+        self._validate_filters(
+            min_price=min_price,
+            max_price=max_price,
+            min_area=min_area,
+            max_area=max_area,
+            min_rooms=min_rooms,
+            max_rooms=max_rooms,
+        )
+
+        listings, total = await self.repository.list(
+            session,
+            page=page,
+            page_size=page_size,
+            sort_field=sort_by.value,
+            sort_descending=sort_order == SortOrder.DESC,
+            user_id=user.id,
             property_type=property_type,
             listing_type=listing_type,
             city=city,

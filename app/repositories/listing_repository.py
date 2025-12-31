@@ -60,6 +60,7 @@ class ListingRepository:
         page_size: int,
         sort_field: str,
         sort_descending: bool,
+        user_id: UUID | None = None,
         property_type: str | None = None,
         listing_type: str | None = None,
         city: str | None = None,
@@ -71,6 +72,8 @@ class ListingRepository:
         max_rooms: int | None = None,
     ) -> tuple[list[Listing], int]:
         conditions = []
+        if user_id:
+            conditions.append(Listing.user_id == user_id)
         if property_type:
             conditions.append(Listing.property_type == property_type)
         if listing_type:
