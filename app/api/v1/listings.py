@@ -1,11 +1,20 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, UploadFile, status
+from fastapi import APIRouter, Depends, File, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_session
 from app.models.user import User, UserRole
-from app.schemas.listing import ListingCreate, ListingImageRead, ListingRead
+from app.schemas.listing import (
+    ListingCreate,
+    ListingImageRead,
+    ListingListRead,
+    ListingRead,
+    ListingSortField,
+    ListingType,
+    PropertyType,
+    SortOrder,
+)
 from app.services.auth_service import require_roles
 from app.services.listing_service import ListingService
 
@@ -14,6 +23,42 @@ router = APIRouter(prefix="/listings", tags=["listings"])
 
 def get_listing_service() -> ListingService:
     return ListingService()
+
+
+@router.get("", response_model=ListingListRead)
+async def list_listings(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    sort_by: ListingSortField = Query(ListingSortField.CREATED_AT),
+    sort_order: SortOrder = Query(SortOrder.DESC),
+    property_type: PropertyType | None = Query(None),
+    listing_type: ListingType | None = Query(None),
+    city: str | None = Query(None, max_length=100),
+    min_price: float | None = Query(None, ge=0),
+    max_price: float | None = Query(None, ge=0),
+    min_area: int | None = Query(None, ge=1),
+    max_area: int | None = Query(None, ge=1),
+    min_rooms: int | None = Query(None, ge=0),
+    max_rooms: int | None = Query(None, ge=0),
+    session: AsyncSession = Depends(get_session),
+    service: ListingService = Depends(get_listing_service),
+) -> ListingListRead:
+    return await service.list_listings(
+        session,
+        page=page,
+        page_size=page_size,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        property_type=property_type,
+        listing_type=listing_type,
+        city=city,
+        min_price=min_price,
+        max_price=max_price,
+        min_area=min_area,
+        max_area=max_area,
+        min_rooms=min_rooms,
+        max_rooms=max_rooms,
+    )
 
 
 @router.post("", response_model=ListingRead, status_code=status.HTTP_201_CREATED)
