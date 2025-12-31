@@ -48,6 +48,10 @@ class ListingRepository:
         await session.refresh(image)
         return image
 
+    async def delete(self, session: AsyncSession, listing: Listing) -> None:
+        await session.delete(listing)
+        await session.flush()
+
     async def list(
         self,
         session: AsyncSession,

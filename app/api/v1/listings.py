@@ -102,3 +102,15 @@ async def update_listing(
     ),
 ) -> ListingRead:
     return await service.update_listing(session, listing_id, payload, current_user)
+
+
+@router.delete("/{listing_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_listing(
+    listing_id: UUID,
+    session: AsyncSession = Depends(get_session),
+    service: ListingService = Depends(get_listing_service),
+    current_user: User = Depends(
+        require_roles((UserRole.USER, UserRole.MODERATOR, UserRole.ADMIN))
+    ),
+) -> None:
+    await service.delete_listing(session, listing_id, current_user)

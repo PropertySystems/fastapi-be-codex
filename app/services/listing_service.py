@@ -76,6 +76,24 @@ class ListingService:
         updated_listing = await self.repository.update(session, existing_listing, listing)
         return ListingRead.model_validate(updated_listing)
 
+    async def delete_listing(
+        self, session: AsyncSession, listing_id: UUID, user: User
+    ) -> None:
+        existing_listing = await self.repository.get_by_id(session, listing_id)
+
+        if not existing_listing:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found"
+            )
+
+        if user.role == UserRole.USER and existing_listing.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You are not allowed to modify this listing",
+            )
+
+        await self.repository.delete(session, existing_listing)
+
     async def list_listings(
         self,
         session: AsyncSession,
