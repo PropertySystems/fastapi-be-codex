@@ -12,6 +12,7 @@ from app.schemas.listing import (
     ListingListRead,
     ListingRead,
     ListingSortField,
+    ListingUpdate,
     SortOrder,
 )
 from app.services.storage_service import GCSStorageService, StorageService
@@ -55,6 +56,25 @@ class ListingService:
         image_url = await storage.upload_listing_image(file, listing_id)
         image = await self.repository.add_image(session, listing_id, image_url)
         return ListingImageRead.model_validate(image)
+
+    async def update_listing(
+        self, session: AsyncSession, listing_id: UUID, listing: ListingUpdate, user: User
+    ) -> ListingRead:
+        existing_listing = await self.repository.get_by_id(session, listing_id)
+
+        if not existing_listing:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found"
+            )
+
+        if user.role == UserRole.USER and existing_listing.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You are not allowed to modify this listing",
+            )
+
+        updated_listing = await self.repository.update(session, existing_listing, listing)
+        return ListingRead.model_validate(updated_listing)
 
     async def list_listings(
         self,

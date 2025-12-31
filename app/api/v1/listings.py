@@ -11,6 +11,7 @@ from app.schemas.listing import (
     ListingListRead,
     ListingRead,
     ListingSortField,
+    ListingUpdate,
     ListingType,
     PropertyType,
     SortOrder,
@@ -88,3 +89,16 @@ async def upload_listing_image(
     ),
 ) -> ListingImageRead:
     return await service.upload_listing_image(session, listing_id, file, current_user)
+
+
+@router.patch("/{listing_id}", response_model=ListingRead)
+async def update_listing(
+    listing_id: UUID,
+    payload: ListingUpdate,
+    session: AsyncSession = Depends(get_session),
+    service: ListingService = Depends(get_listing_service),
+    current_user: User = Depends(
+        require_roles((UserRole.USER, UserRole.MODERATOR, UserRole.ADMIN))
+    ),
+) -> ListingRead:
+    return await service.update_listing(session, listing_id, payload, current_user)
