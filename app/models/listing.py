@@ -38,8 +38,22 @@ class Listing(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     title = Column(String(255), nullable=False)
     description = Column(Text)
-    property_type = Column(Enum(PropertyType, name="property_type_enum"), nullable=False)
-    listing_type = Column(Enum(ListingType, name="listing_type_enum"), nullable=False)
+    property_type = Column(
+        Enum(
+            PropertyType,
+            name="property_type_enum",
+            values_callable=lambda enum_cls: [item.value for item in enum_cls],
+        ),
+        nullable=False,
+    )
+    listing_type = Column(
+        Enum(
+            ListingType,
+            name="listing_type_enum",
+            values_callable=lambda enum_cls: [item.value for item in enum_cls],
+        ),
+        nullable=False,
+    )
     price = Column(Numeric(12, 2), nullable=False)
     currency = Column(String(3), nullable=False)
     city = Column(String(100), nullable=False)

@@ -3,6 +3,7 @@ import uuid
 from pathlib import Path
 
 from fastapi import HTTPException, UploadFile, status
+from google.api_core.exceptions import BadRequest
 from google.cloud import storage
 from google.oauth2 import service_account
 
@@ -41,6 +42,23 @@ class GCSStorageService(StorageService):
 
         file.file.seek(0)
         blob.upload_from_file(file.file, content_type=file.content_type)
-        blob.make_public()
+
+        if self._bucket_allows_object_acls(bucket):
+            try:
+                blob.make_public()
+            except BadRequest as exc:
+                if "uniform bucket-level access" not in str(exc).lower():
+                    raise
 
         return blob.public_url
+
+    def _bucket_allows_object_acls(self, bucket: storage.Bucket) -> bool:
+        try:
+            bucket.reload()
+        except Exception:
+            return True
+
+        iam_configuration = bucket.iam_configuration
+        return not bool(
+            getattr(iam_configuration, "uniform_bucket_level_access_enabled", False)
+        )

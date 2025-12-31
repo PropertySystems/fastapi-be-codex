@@ -2,6 +2,7 @@ from uuid import UUID
 
 from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.attributes import set_committed_value
 
 from app.models.user import User, UserRole
 from app.repositories.listing_repository import ListingRepository
@@ -22,6 +23,8 @@ class ListingService:
         self, session: AsyncSession, listing: ListingCreate, user: User
     ) -> ListingRead:
         created = await self.repository.create(session, listing, user.id)
+        # Avoid lazy-loading images during response serialization.
+        set_committed_value(created, "images", [])
         return ListingRead.model_validate(created)
 
     async def upload_listing_image(
