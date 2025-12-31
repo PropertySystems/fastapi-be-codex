@@ -35,6 +35,18 @@ class ListingService:
         set_committed_value(created, "images", [])
         return ListingRead.model_validate(created)
 
+    async def get_listing(
+        self, session: AsyncSession, listing_id: UUID
+    ) -> ListingRead:
+        listing = await self.repository.get_by_id(session, listing_id)
+
+        if not listing:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found"
+            )
+
+        return ListingRead.model_validate(listing)
+
     async def upload_listing_image(
         self, session: AsyncSession, listing_id: UUID, file: UploadFile, user: User
     ) -> ListingImageRead:

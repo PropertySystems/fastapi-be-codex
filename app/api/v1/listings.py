@@ -114,6 +114,15 @@ async def create_listing(
     return await service.create_listing(session, payload, current_user)
 
 
+@router.get("/{listing_id}", response_model=ListingRead)
+async def get_listing(
+    listing_id: UUID,
+    session: AsyncSession = Depends(get_session),
+    service: ListingService = Depends(get_listing_service),
+) -> ListingRead:
+    return await service.get_listing(session, listing_id)
+
+
 @router.post(
     "/{listing_id}/images",
     response_model=ListingImageRead,
